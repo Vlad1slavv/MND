@@ -4,6 +4,8 @@ from numpy.linalg import solve
 from scipy.stats import f, t
 from functools import partial
 
+insignificant_coeffs = 0
+
 
 class FractionalExperiment:
     """Проведення дробового трьохфакторного експерименту"""
@@ -117,6 +119,7 @@ class FractionalExperiment:
         return F_p
 
     def check(self):
+        global insignificant_coeffs
         """Проведення статистичних перевірок"""
         student = partial(t.ppf, q=1 - 0.025)
         t_student = student(df=self.f3)
@@ -125,7 +128,7 @@ class FractionalExperiment:
         Gp, G_kr = self.kohren()
         print(f'Gp = {Gp}')
         if Gp < G_kr:
-            print(f'З ймовірністю {1-self.q} дисперсії однорідні.')
+            print(f'З ймовірністю {1 - self.q} дисперсії однорідні.')
         else:
             print("Необхідно збільшити кількість дослідів")
             self.m += 1
@@ -137,6 +140,7 @@ class FractionalExperiment:
         res = [t for t in ts if t > t_student]
         B = self.count_koefs()
         final_k = [B[ts.index(i)] for i in ts if i in res]
+        insignificant_coeffs += len(final_k)
         print('Коефіцієнти {} статистично незначущі, тому ми виключаємо їх з рівняння.'.format(
             [i for i in B if i not in final_k]))
 
@@ -161,5 +165,8 @@ class FractionalExperiment:
             print('Математична модель не адекватна експериментальним даним')
 
 
-experiment = FractionalExperiment(7, 8)
-experiment.check()
+
+for _ in range(100):
+    experiment = FractionalExperiment(7, 8)
+    experiment.check()
+print(f"Середня кількість значимих коефіцієнтів {insignificant_coeffs / 100}")
