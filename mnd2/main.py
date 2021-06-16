@@ -72,6 +72,7 @@ Rkr = 2
 for i in range(len(Ruv)):
     if Ruv[i] > Rkr:
         print('Помилка, повторіть експеримент')
+        exit(1)
 
 mx1 = (xn[0][0] + xn[1][0] + xn[2][0]) / 3
 mx2 = (xn[0][1] + xn[1][1] + xn[2][1]) / 3
